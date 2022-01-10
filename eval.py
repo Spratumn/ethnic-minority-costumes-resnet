@@ -1,6 +1,6 @@
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
-
+# 本文件与svm部分的eval.py基本相同
 
 def plot_confusion_matrix(preds, gts, savePath, labels=None):
     cm = confusion_matrix(gts, preds)
@@ -36,7 +36,7 @@ def plot_prediction(predDict, savePath):
     ax.bar(labels, false, width, bottom=true, label='false')
 
     ax.set_ylabel('prediction')
-    ax.set_title('prediction of svm')
+    ax.set_title('prediction of resnet')
     ax.legend()
     plt.savefig(savePath)
 

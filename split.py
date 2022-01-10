@@ -64,4 +64,5 @@ def split_dataset(originDatasetDir, datasetRootDir):
             pass
 
 if __name__ == '__main__':
-    split_dataset(originDatasetDir='./ori/datasets/', datasetRootDir='./datasets')
+    pass
+    # split_dataset(originDatasetDir='./ori/datasets/', datasetRootDir='./datasets')

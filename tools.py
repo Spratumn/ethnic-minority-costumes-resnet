@@ -167,12 +167,12 @@ if __name__ == '__main__':
     pass
 
     # 运行测试评价，获得混淆矩阵和预测图
-    # run_eval(datasetDir='./datasets', checkpoint='log/resnet-alter-0.0005-batch-32/checkpoint')
+    run_eval(datasetDir='./datasets', checkpoint='log/resnet-alter-0.0005-batch-32/checkpoint')
     
     
     # 绘制卷积特征图
-    draw_convlayer_features(imagepath='datasets/trainset/manzu/0000015.jpg', 
-                            checkpoint='log/resnet-alter-0.0005-batch-32/checkpoint')
+    # draw_convlayer_features(imagepath='datasets/trainset/manzu/0000015.jpg', 
+    #                         checkpoint='log/resnet-alter-0.0005-batch-32/checkpoint')
     
     # 对比不同的训练过程，并绘制损失和准确率曲线
     # draw_diff_loss_acc(logs=[

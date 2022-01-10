@@ -3,15 +3,19 @@ from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Dropout, Dense,
 
 from resnet_config import *
 
+# 根据配置参数创建原版resnet或调整后的resnet
 def create_model(classNums=5, flag=0):
+    # 创建原版resnet
     if flag == 0:
         model = ResNet50(classNums, dropout=DROPOUT)
+    # 创建调整后的resnet
     else:
-        act = None # tf.nn.leaky_relu
+        # 可以考虑将原版中的relu替换为leaky_relu，（没有进行测试）
+        act = None # tf.nn.leaky_relu 
         model = MyResNet50(classNums=classNums, inputSize=INPUTSIZE, act=act, dropout=DROPOUT)
     return model
 
-# 原版resnet
+# 原版resnet50
 def ResNet50(classNums, dropout=0.0):
     layers_dims=[3,4,6,3]
     
@@ -42,7 +46,7 @@ def ResNet50(classNums, dropout=0.0):
     return model
 
 
-# 调整后的resnet
+# 调整后的resnet50
 def MyResNet50(classNums, inputSize=(224, 224), act=None, dropout=0.0):
     
     layers_dims=[3,4,6,3]
@@ -50,10 +54,11 @@ def MyResNet50(classNums, inputSize=(224, 224), act=None, dropout=0.0):
     filter_block1=[64, 64, 256]
     filter_block2=[128,128,512]
     filter_block3=[256,256,1024]
+    # 调整2：将resnet最后一个block的每个输出通道由2048减少到1024（减少了模型参数，减轻过拟合）。
     filter_block4=[512,512,1024]
 
     if act is None: act = 'relu'
-
+    # 调整1：将原版中固定的模型输入尺寸，调整为支持自定义尺寸（inputSize：（w,h））
     input = Input(shape=(inputSize[1], inputSize[0], 3))
     # stem block 
     x = Conv2D(64, (7,7), strides=(2,2),padding='same', name='stem_conv')(input)

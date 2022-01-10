@@ -5,11 +5,46 @@ import numpy as np
 import tqdm
 
 
+# 对训练集进行数据增强操作
+def generate_augment_images(trainsetDir, n=5):
+    """
+    trainsetDir: 训练集路径
+    n: 每张图像进行增强的次数
+    """
+    augmenter = Augmenter()
+    folders = os.listdir(trainsetDir)
+    for folder in folders:
+        folderDir = os.path.join(trainsetDir, folder)
+        imagenames = os.listdir(folderDir)
+        for imagename in tqdm.tqdm(imagenames):
+            imagepath = os.path.join(folderDir, imagename)
+            filename, suffix = imagename.split('.')
+            image = cv2.imread(imagepath)
+            for i in range(n):
+                augmentImage = augmenter(image)
+                cv2.imwrite(os.path.join(folderDir, f'{filename}_{i}.{suffix}'), augmentImage)
+
+
+# 清除增强的图像数据，即将上面增强处理获得的图像自动批量删除
+def clean_augment_images(trainsetDir):
+    folders = os.listdir(trainsetDir)
+    for folder in folders:
+        folderDir = os.path.join(trainsetDir, folder)
+        imagenames = os.listdir(folderDir)
+        for imagename in imagenames:
+            if imagename.split('.')[0].endswith(('_0', '_1', '_2', '_3', '_4')):
+                os.remove(os.path.join(folderDir, imagename))
+
+
+
+# 数据增强器
 class Augmenter(object):
     def __init__(self):
+        # 可用的增强方法
         self.augmenters = [random_crop, random_flip, random_rotate, random_shelter]
 
     def __call__(self, image):
+        # 随机对输入图像使用提供的增强方法进行多种组合增强
         n = random.randint(1, 4)
         augs = []
         for _ in range(n):
@@ -20,7 +55,7 @@ class Augmenter(object):
         return image
 
 
-
+# 随机裁剪
 def random_crop(image, randomScale=True):
     scale = random.randint(5, 9) / 10 if randomScale else 0.6
     H, W = image.shape[:2]
@@ -32,10 +67,13 @@ def random_crop(image, randomScale=True):
     return out
 
 
+# 随机进行翻转
 def random_flip(image):
     image = image[:, ::-1, :]
     return image
 
+
+# 随机旋转
 def random_rotate(image):
     h, w = image.shape[:2]
     center = (w // 2, h // 2)
@@ -45,6 +83,8 @@ def random_rotate(image):
     rotated = cv2.warpAffine(image, M, (w, h))
     return rotated
 
+
+# 随机噪声（比较耗时）
 def random_noise(image):
     def clamp(pv):
         if pv > 255:
@@ -68,6 +108,8 @@ def random_noise(image):
             image[row, col, 2] = clamp(r + s[2])
     return image
 
+
+# 随机遮挡
 def random_shelter(image):
     h, w = image.shape[:2]
     vmin, vmax = int(min(h, w) * 0.1), int(min(h, w) * 0.2)
@@ -92,33 +134,15 @@ def random_shelter(image):
     return image
 
 
-def generate_augment_images(trainsetDir, n=5):
-    augmenter = Augmenter()
-    folders = os.listdir(trainsetDir)
-    for folder in folders:
-        folderDir = os.path.join(trainsetDir, folder)
-        imagenames = os.listdir(folderDir)
-        for imagename in tqdm.tqdm(imagenames):
-            imagepath = os.path.join(folderDir, imagename)
-            filename, suffix = imagename.split('.')
-            image = cv2.imread(imagepath)
-            for i in range(n):
-                augmentImage = augmenter(image)
-                cv2.imwrite(os.path.join(folderDir, f'{filename}_{i}.{suffix}'), augmentImage)
 
 
-def clean_augment_images(trainsetDir):
-    folders = os.listdir(trainsetDir)
-    for folder in folders:
-        folderDir = os.path.join(trainsetDir, folder)
-        imagenames = os.listdir(folderDir)
-        for imagename in imagenames:
-            if imagename.split('.')[0].endswith(('_0', '_1', '_2', '_3', '_4')):
-                os.remove(os.path.join(folderDir, imagename))
 
 
 if __name__ == '__main__':
     pass
+    # 对训练集进行数据增强操作
     # generate_augment_images(trainsetDir='datasets/trainset', n=4)
+
+    # 清除增强的图像数据，即将上面增强处理获得的图像自动批量删除
     # clean_augment_images(trainsetDir='datasets/trainset')
 
